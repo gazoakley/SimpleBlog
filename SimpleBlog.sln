@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleBlog", "SimpleBlog\SimpleBlog.csproj", "{C8006D33-526E-4568-BD94-1F665B36D8CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6F57A315-6BEB-4188-9F8F-1FFB0DC779E6}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AED63FE2-F559-4770-ABA2-055216F6BD4A}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C8006D33-526E-4568-BD94-1F665B36D8CF}.Debug|x86.ActiveCfg = Debug|x86
+		{C8006D33-526E-4568-BD94-1F665B36D8CF}.Debug|x86.Build.0 = Debug|x86
+		{C8006D33-526E-4568-BD94-1F665B36D8CF}.Release|x86.ActiveCfg = Release|x86
+		{C8006D33-526E-4568-BD94-1F665B36D8CF}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

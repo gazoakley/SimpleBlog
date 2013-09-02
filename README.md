@@ -1,0 +1,1 @@
+SimpleBlog is an example of a simple blogging platform built on Nancy.
