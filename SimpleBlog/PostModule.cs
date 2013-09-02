@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Nancy;
+using Nancy.ModelBinding;
+using SimpleBlog.Entities;
 
 namespace SimpleBlog
 {
@@ -19,9 +21,13 @@ namespace SimpleBlog
             Delete["/{id}"] = _ => Destroy(_.id);
         }
 
-        public string Index()
+        public IEnumerable<Post> Index()
         {
-            return "index";
+            using (var session = DbSessionFactory.SessionFactory.OpenSession())
+            {
+                var posts = session.QueryOver<Post>().List();
+                return posts;
+            }
         }
 
         public string Create()
@@ -31,26 +37,63 @@ namespace SimpleBlog
 
         public string Store()
         {
+            using (var session = DbSessionFactory.SessionFactory.OpenSession())
+            using (var transaction = session.BeginTransaction())
+            {
+                var post = this.Bind<Post>(p => p.Id);
+                session.Save(post);
+                transaction.Commit();
+            }
+
+            // Redirect to show or display error
             return "store";
         }
 
-        public string Show(int id)
+        public Post Show(int id)
         {
-            return "show";
+            using (var session = DbSessionFactory.SessionFactory.OpenSession())
+            {
+                var post = session.Get<Post>(id);
+                return post;
+            }
         }
 
         public string Edit(int id)
         {
+            Post post;
+            using (var session = DbSessionFactory.SessionFactory.OpenSession())
+            {
+                post = session.Get<Post>(id);
+            }
+
             return "edit";
         }
 
         public string Update(int id)
         {
+            using (var session = DbSessionFactory.SessionFactory.OpenSession())
+            using (var transaction = session.BeginTransaction())
+            {
+                var post = session.Get<Post>(id);
+                post = this.BindTo(post);
+                session.Update(post);
+                transaction.Commit();
+            }
+
+            // Redirect to show or display error
             return "update";
         }
 
         public string Destroy(int id)
         {
+            using (var session = DbSessionFactory.SessionFactory.OpenSession())
+            using (var transaction = session.BeginTransaction())
+            {
+                var post = session.Get<Post>(id);
+                session.Delete(post);
+                transaction.Commit();
+            }
+
             return "destroy";
         }
     }
