@@ -9,6 +9,7 @@ namespace SimpleBlog.Entities
     {
         public virtual int Id { get; protected set; }
         public virtual string Subject { get; set; }
+        public virtual DateTime CreatedDate { get; set; }
         public virtual string Body { get; set; }
     }
 }
