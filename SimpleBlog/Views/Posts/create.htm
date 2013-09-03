@@ -2,16 +2,26 @@
 
 @Section['Content']
 
-<header>Create Post</header>
+<header><h1>Create Post</h1></header>
+
+<hr />
 
 <article>
 
-<form action="/" method="POST">
+<form action="/" method="POST" role="form">
+    
 
-<input name="subject" /><br />
-<textarea name="body"></textarea><br />
+<div class="form-group">
+    <label for="subject">Subject</label>
+    <input name="subject" class="form-control" placeholder="Subject"/><br />
+</div>
 
-<input type="submit" value="Save" />
+<div class="form-group">
+    <label for="body">Body</label>
+    <textarea name="body" class="form-control"></textarea><br />
+</div>
+
+<input type="submit" value="Save"  class="btn btn-default"/>
 
 </form>
 
