@@ -4,12 +4,14 @@
 
 <article>
 
-<header><h1>@Model.Post.Subject</h1></header>
+<div class="pull-right"><a href="/@Model.Post.Id/edit">Edit Post</a></div>
+
+<header><h1>@!Model.Post.Subject</h1></header>
 
 <hr />
 
 <section>
-<p>@Model.Post.Body</p>
+<p><span style="white-space: pre-line">@!Model.Post.Body</span></p>
 </section>
 
 </article>
