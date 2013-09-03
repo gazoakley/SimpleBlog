@@ -14,23 +14,11 @@ namespace SimpleBlog
     {
         public PostModule()
         {
-            //Before += ctx =>
-            //{
-            //    if (ctx.Request.Method == "POST")
-            //    {
-            //        if (ctx.Parameters.method.HasValue)
-            //        {
-            //            ctx.Request = new Request(ctx.Parameters.method);
-            //        }
-            //    }
-            //    return null;
-            //};
-
             Get["/"] = _ => View["posts/index", Index()];
             Get["/create"] = _ => View["posts/create"];
             Post["/"] = _ => Store();
             Get["/{id}"] = _ => View["posts/show", Show(_.id)];
-            Get["/{id}/edit"] = _ => Edit(_.id);
+            Get["/{id}/edit"] = _ => View["posts/edit", Edit(_.id)];
             Put["/{id}"] = _ => Update(_.id);
             Delete["/{id}"] = _ => Destroy(_.id);
         }
@@ -39,7 +27,7 @@ namespace SimpleBlog
         {
             using (var session = DbSessionFactory.SessionFactory.OpenSession())
             {
-                var posts = session.QueryOver<Post>().List();
+                var posts = session.QueryOver<Post>().OrderBy(post => post.CreatedDate).Desc.List();
                 
                 dynamic model = new ExpandoObject();
                 model.Posts = posts;
@@ -54,11 +42,11 @@ namespace SimpleBlog
             using (var transaction = session.BeginTransaction())
             {
                 var post = this.Bind<Post>();
+                post.CreatedDate = DateTime.UtcNow;
                 session.Save(post);
                 transaction.Commit();
 
-                // Redirect to show
-                return Response.AsRedirect(string.Format("/{0}", post.Id), RedirectResponse.RedirectType.Permanent);
+                return Response.AsRedirect(string.Format("/{0}", post.Id));
             }
         }
 
@@ -67,7 +55,6 @@ namespace SimpleBlog
             using (var session = DbSessionFactory.SessionFactory.OpenSession())
             {
                 var post = session.Get<Post>(id);
-
                 dynamic model = new ExpandoObject();
                 model.Post = post;
 
@@ -75,18 +62,19 @@ namespace SimpleBlog
             }
         }
 
-        public string Edit(int id)
+        public dynamic Edit(int id)
         {
-            Post post;
             using (var session = DbSessionFactory.SessionFactory.OpenSession())
             {
-                post = session.Get<Post>(id);
-            }
+                var post = session.Get<Post>(id);
+                dynamic model = new ExpandoObject();
+                model.Post = post;
 
-            return "edit";
+                return model;
+            }
         }
 
-        public string Update(int id)
+        public dynamic Update(int id)
         {
             using (var session = DbSessionFactory.SessionFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
@@ -95,13 +83,12 @@ namespace SimpleBlog
                 post = this.BindTo(post);
                 session.Update(post);
                 transaction.Commit();
-            }
 
-            // Redirect to show or display error
-            return "update";
+                return Response.AsRedirect(string.Format("/{0}", post.Id));
+            }
         }
 
-        public string Destroy(int id)
+        public dynamic Destroy(int id)
         {
             using (var session = DbSessionFactory.SessionFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
@@ -109,9 +96,9 @@ namespace SimpleBlog
                 var post = session.Get<Post>(id);
                 session.Delete(post);
                 transaction.Commit();
-            }
 
-            return "destroy";
+                return Response.AsRedirect("/");
+            }
         }
     }
 }
