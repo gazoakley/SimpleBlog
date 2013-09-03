@@ -2,19 +2,33 @@
 
 @Section['Content']
 
-<header>Edit Post</header>
+<header><h1>Edit Post</h1></header>
+
+<hr />
 
 <article>
 
-<form action="/" method="POST">
+<form action="/@Model.Post.Id" method="POST" role="form" style="display: inline;">
+    
+<input type="hidden" name="_method" value="PUT" />
 
-<input name="method" value="PUT" />
-@AntiForgeryToken
-<input name="subject" />
-<textarea name="body"></textarea>
+<div class="form-group">
+    <label for="subject">Subject</label>
+    <input name="subject" class="form-control" placeholder="Subject" value="@!Model.Post.Subject"/><br />
+</div>
 
-<input type="submit" value="Save" />
+<div class="form-group">
+    <label for="body">Body</label>
+    <textarea name="body" class="form-control" rows="10">@!Model.Post.Body</textarea><br />
+</div>
 
+<input type="submit" value="Save"  class="btn btn-default" />
+
+</form>
+
+<form action="/@Model.Post.Id" method="POST" role="form" style="display: inline;">
+    <input type="hidden" name="_method" value="DELETE" /> 
+    <input type="submit" value="Delete"  class="btn btn-default" />
 </form>
 
 </article>
