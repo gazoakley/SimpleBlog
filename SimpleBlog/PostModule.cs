@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using Nancy;
 using Nancy.ModelBinding;
+using Nancy.Responses;
 using SimpleBlog.Entities;
 
 namespace SimpleBlog
@@ -12,49 +14,64 @@ namespace SimpleBlog
     {
         public PostModule()
         {
-            Get["/"] = _ => Index();
-            Get["/create"] = _ => Create();
+            //Before += ctx =>
+            //{
+            //    if (ctx.Request.Method == "POST")
+            //    {
+            //        if (ctx.Parameters.method.HasValue)
+            //        {
+            //            ctx.Request = new Request(ctx.Parameters.method);
+            //        }
+            //    }
+            //    return null;
+            //};
+
+            Get["/"] = _ => View["posts/index", Index()];
+            Get["/create"] = _ => View["posts/create"];
             Post["/"] = _ => Store();
-            Get["/{id}"] = _ => Show(_.id);
+            Get["/{id}"] = _ => View["posts/show", Show(_.id)];
             Get["/{id}/edit"] = _ => Edit(_.id);
             Put["/{id}"] = _ => Update(_.id);
             Delete["/{id}"] = _ => Destroy(_.id);
         }
 
-        public IEnumerable<Post> Index()
+        public dynamic Index()
         {
             using (var session = DbSessionFactory.SessionFactory.OpenSession())
             {
                 var posts = session.QueryOver<Post>().List();
-                return posts;
+                
+                dynamic model = new ExpandoObject();
+                model.Posts = posts;
+
+                return model;
             }
         }
 
-        public string Create()
-        {
-            return "create";
-        }
-
-        public string Store()
+        public dynamic Store()
         {
             using (var session = DbSessionFactory.SessionFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
             {
-                var post = this.Bind<Post>(p => p.Id);
+                var post = this.Bind<Post>();
                 session.Save(post);
                 transaction.Commit();
-            }
 
-            // Redirect to show or display error
-            return "store";
+                // Redirect to show
+                return Response.AsRedirect(string.Format("/{0}", post.Id), RedirectResponse.RedirectType.Permanent);
+            }
         }
 
-        public Post Show(int id)
+        public dynamic Show(int id)
         {
             using (var session = DbSessionFactory.SessionFactory.OpenSession())
             {
                 var post = session.Get<Post>(id);
-                return post;
+
+                dynamic model = new ExpandoObject();
+                model.Post = post;
+
+                return model;
             }
         }
 
