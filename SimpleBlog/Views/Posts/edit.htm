@@ -1,0 +1,22 @@
+﻿@Master['master']
+
+@Section['Content']
+
+<header>Edit Post</header>
+
+<article>
+
+<form action="/" method="POST">
+
+<input name="method" value="PUT" />
+@AntiForgeryToken
+<input name="subject" />
+<textarea name="body"></textarea>
+
+<input type="submit" value="Save" />
+
+</form>
+
+</article>
+
+@EndSection
