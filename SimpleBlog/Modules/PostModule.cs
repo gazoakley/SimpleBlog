@@ -12,93 +12,61 @@ namespace SimpleBlog
 {
     public class PostModule : NancyModule
     {
-        public PostModule()
+        private IPostRepository _postRepository;
+
+        public PostModule(IPostRepository postRepository)
         {
+            _postRepository = postRepository;
+
             Get["/"] = _ => View["posts/index", Index()];
             Get["/create"] = _ => View["posts/create"];
             Post["/"] = _ => Store();
             Get["/{id}"] = _ => View["posts/show", Show(_.id)];
-            Get["/{id}/edit"] = _ => View["posts/edit", Edit(_.id)];
+            Get["/{id}/edit"] = _ => View["posts/edit", Show(_.id)];
             Put["/{id}"] = _ => Update(_.id);
             Delete["/{id}"] = _ => Destroy(_.id);
         }
 
         public dynamic Index()
         {
-            using (var session = DbSessionFactory.SessionFactory.OpenSession())
-            {
-                var posts = session.QueryOver<Post>().OrderBy(post => post.CreatedDate).Desc.List();
-                
-                dynamic model = new ExpandoObject();
-                model.Posts = posts;
+            dynamic model = new ExpandoObject();
+            model.Posts = _postRepository.GetAll();
 
-                return model;
-            }
+            return model;
         }
 
         public dynamic Store()
         {
-            using (var session = DbSessionFactory.SessionFactory.OpenSession())
-            using (var transaction = session.BeginTransaction())
-            {
-                var post = this.Bind<Post>();
-                post.CreatedDate = DateTime.UtcNow;
-                session.Save(post);
-                transaction.Commit();
+            var post = this.Bind<Post>();
+            _postRepository.Store(post);
 
-                return Response.AsRedirect(string.Format("/{0}", post.Id));
-            }
+            return Response.AsRedirect(string.Format("/{0}", post.Id));
         }
 
         public dynamic Show(int id)
         {
-            using (var session = DbSessionFactory.SessionFactory.OpenSession())
-            {
-                var post = session.Get<Post>(id);
-                dynamic model = new ExpandoObject();
-                model.Post = post;
+            var post = _postRepository.Get(id);
+            dynamic model = new ExpandoObject();
+            model.Post = post;
 
-                return model;
-            }
-        }
-
-        public dynamic Edit(int id)
-        {
-            using (var session = DbSessionFactory.SessionFactory.OpenSession())
-            {
-                var post = session.Get<Post>(id);
-                dynamic model = new ExpandoObject();
-                model.Post = post;
-
-                return model;
-            }
+            return model;
         }
 
         public dynamic Update(int id)
         {
-            using (var session = DbSessionFactory.SessionFactory.OpenSession())
-            using (var transaction = session.BeginTransaction())
-            {
-                var post = session.Get<Post>(id);
-                post = this.BindTo(post);
-                session.Update(post);
-                transaction.Commit();
+            var post = _postRepository.Get(id);
+            post = this.BindTo(post);
+            _postRepository.Update(post);
 
-                return Response.AsRedirect(string.Format("/{0}", post.Id));
-            }
+            return Response.AsRedirect(string.Format("/{0}", post.Id));
         }
 
         public dynamic Destroy(int id)
         {
-            using (var session = DbSessionFactory.SessionFactory.OpenSession())
-            using (var transaction = session.BeginTransaction())
-            {
-                var post = session.Get<Post>(id);
-                session.Delete(post);
-                transaction.Commit();
+            var post = _postRepository.Get(id);
+            _postRepository.Destroy(post);
 
-                return Response.AsRedirect("/");
-            }
+            return Response.AsRedirect("/");
         }
     }
 }
