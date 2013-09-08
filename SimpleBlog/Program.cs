@@ -10,7 +10,8 @@ namespace SimpleBlog
     {
         static void Main(string[] args)
         {
-            var nancyHost = new NancyHost(new Uri("http://localhost:1234/"));
+            var bootstrapper = new Bootstrapper();
+            var nancyHost = new NancyHost(new Uri("http://localhost:1234/"), bootstrapper);
             nancyHost.Start();
             Console.Read();
             nancyHost.Stop();
